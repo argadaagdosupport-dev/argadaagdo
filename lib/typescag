@@ -1,0 +1,347 @@
+                                                                                                   tring;
+  emoji: string;
+  quantity: number;
+};
+EOF
+
+cat > lib/data.ts <<'EOF'
+import { Offer } from "./types";
+
+export const offers: Offer[] = [
+  {
+    id: 1,
+    title: "Bakery Surprise Bag",
+    place: "Green Bakery"    place: "Green Bakery"    place: "Green Bakery"    place: "Green Bakery"    place: "Green Bakery"    place: "Green Bakery"    place: "Green Bakery"    place: "Green Bakery"    place: "Green Bakery"    place: "Green Bakery"    place: "Green Bakery"    place: "Green Bakery"    place: "Green Bakery"    place: "Green Bakery"    place: "Green Bakery"    place: "Green B🍰"    place: "Green Bakery"    place: "Green Bakery"    place: "Green Bakery"    place: "Green Bakery"    place: "Green Bakery"    place: "Green Bakery"    place: "Green Bakery"    place: "Green 21:    pl2:00",
+              ta            emoji: "🍝",
+              ta            emoji: "🍝",
+Bakery"    place: "Green Bakery"  place: "City Market",
+    location: "Didube, Tbilisi",
+    price: "₾10",
+    oldPrice: "₾28",
+    time: "18:00 - 20:00",
+    type: "Supermarket",
+    emoji: "🥗",
+    quantity: 8,
+  },
+];
+EOF
+
+cat > components/OfferCard.tsx <<'EOF'
+import { Offer } from "@/lib/types";
+
+export default function OfferCard({ offer }: { offer: Offer }) {
+  return (
+    <div className="overflow-hidden rounded-3xl bg-white shadow-sm">
+      <div className="flex h-48 items-center justify-center bg-green-100 text-7xl">
+        {offer.emoji}
+      </div>
+
+      <div className="p-6">
+        <div className="mb-3 flex items-center justify-between">
+          <span className="rounded-full bg-green-50 px-3 py-1 text-sm font-bold text-green-700">
+            {offer.type}
+          </span>
+          <span className="text-sm font-semibold text-gray-500">{offer.time}</span>
+        </div>
+
+        <h4 className="text-2xl font-black">{offer.title}</h4>
+        <p className="mt-1 font-semibold text-gray-700">{offer.place}</p>
+        <p className="text-gray-500">{offer.location}</p>
+        <p className="mt-2 text-sm font-semibold text-gray-500">Available: {offer.quantity}</p>
+
+        <div className="mt-6 flex items-center justify-between">
+          <div>
+            <span className="text-3xl font-black text-green-700">{offer.price}</span>
+            <span className="ml-2 text-gray-400 line-through">{offer.oldPrice}</span>
+          </div>
+
+          <button className="rounded-full bg-green-700 px-5 py-3 font-bold text-white">
+            Reserve
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+EOF
+
+cat > components/Footer.tsx <<'EOF'
+export default function Footer() {
+  return (
+    <footer className="px-6 py-8 text-center text-gray-500">
+      © 2026 ArGadaagdo — Food saving platform in Georgia
+    </footer>
+  );
+}
+EOF
+
+cat > components/StatCard.tsx <<'EOF'
+export default function StatCard({ title, value }: { title: string; value: string }) {
+  return (
+    <div className="rounded-3xl bg-white p-6 shadow-sm">
+      <p className="text-gray-500">{title}</p>
+      <p className="mt-2 text-4xl font-black text-green-700">{value}</p>
+    </div>
+  );
+}
+EOF
+
+cat > components/BusinessCard.tsx <<'EOF'
+export default function BusinessCard() {
+  return (
+    <div className="rounded-3xl bg-white p-6 shadow-sm">
+      <p className="text-xl font-black">Green Bakery</p>
+      <p className="mt-1 text-gray-500">Vake, Tbilisi</p>
+      <div className="mt-5 flex gap-3">
+        <button className="rounded-full bg-green-700 px-5 py-3 font-bold text-white">Approve</button>
+        <button className="rounded-full bg-gray-100 px-5 py-3 font-bold">Reject</button>
+      </div>
+    </div>
+  );
+}
+EOF
+
+cat > app/page.tsx <<'EOF'
+import Navbar from "@/components/Navbar";
+import Hero from "@/components/Hero";
+import OfferCard from "@/components/OfferCard";
+import Footer from "@/components/Footer";
+import { offers } from "@/lib/data";
+
+export default function Home() {
+  return (
+    <main className="min-h-screen bg-[#F7F6EF]">
+      <Navbar />
+      <Hero />
+
+      <section className="px-6 py-10 md:px-12">
+        <div className="mb-8 flex items-end justify-between">
+          <div>
+            <h3 className="text-3xl font-black">Today’s offers</h3>
+            <p className="mt-2 text-gray-600">Available for pickup in Tbilisi</p>
+          </div>
+          <span className="rounded-full bg-white px-4 py-2 font-semibold text-green-700">Pickup only</span>
+        </div>
+
+        <div className="grid gap-6 md:grid-cols-3">
+          {offers.slice(0, 3).map((offer) => (
+            <OfferCard key={offer.id} offer={offer} />
+          ))}
+        </div>
+      </section>
+
+      <section className="grid gap-6 px-6 py-16 md:grid-cols-3 md:px-12">
+        <div className="rounded-3xl bg-white p-8">
+          <div className="text-4xl">📍</div>
+          <h4 className="mt-4 text-2xl font-black">Find nearby food</h4>
+          <p className="mt-2 text-gray-600">Browse available food boxes from approved businesses.</p>
+        </div>
+        <div className="rounded-3xl bg-white p-8">
+          <div className="text-4xl">💸</div>
+          <h4 className="mt-4 text-2xl font-black">Reserve for less</h4>
+          <p className="mt-2 text-gray-600">Get quality food at a lower price and pay on pickup.</p>
+        </div>
+        <div className="rounded-3xl bg-white p-8">
+          <div className="text-4xl">🥡</div>
+          <h4 className="mt-4 text-2xl font-black">Pick it up</h4>
+          <p className="mt-2 text-gray-600">Visit the store during pickup time and collect your order.</p>
+        </div>
+      </section>
+
+      <Footer />
+    </main>
+  );
+}
+EOF
+
+cat > app/offers/page.tsx <<'EOF'
+import Navbar from "@/components/Navbar";
+import OfferCard from "@/components/OfferCard";
+import Footer from "@/components/Footer";
+import { offers } from "@/lib/data";
+
+export default function OffersPage() {
+  return (
+    <main className="min-h-screen bg-[#F7F6EF]">
+      <Navbar />
+
+      <section className="px-6 py-12 md:px-12">
+        <h1 className="text-5xl font-black">Available Offers</h1>
+        <p className="mt-3 text-gray-600">Food boxes available for pickup in Tbilisi.</p>
+
+        <div className="mt-6 flex flex-wrap gap-3">
+          {["All", "Bakery", "Cafe", "Restaurant", "Supermarket"].map((item) => (
+            <button key={item} className="rounded-full bg-white px-5 py-3 font-bold text-green-700">
+              {item}
+            </button>
+          ))}
+        </div>
+
+        <div className="mt-8 grid gap-6 md:grid-cols-3">
+          {offers.map((offer) => (
+            <OfferCard key={offer.id} offer={offer} />
+          ))}
+        </div>
+      </section>
+
+      <Footer />
+    </main>
+  );
+}
+EOF
+
+cat > app/login/page.tsx <<'EOF'
+import Navbar from "@/components/Navbar";
+
+export default function LoginPage() {
+  return (
+    <main className="min-h-screen bg-[#F7F6EF]">
+      <Navbar />
+
+      <section className="mx-auto max-w-md px-6 py-16">
+        <div className="rounded-3xl bg-white p-8 shadow-sm">
+          <h1 className="text-3xl font-black">Sign In</h1>
+          <p className="mt-2 text-gray-600">Login will connect to Supabase later.</p>
+
+          <input className="mt-6 w-full rounded-2xl border p-4" placeholder="Email" />
+          <input className="mt-4 w-full rounded-2xl border p-4" placeholder="Password" type="password" />
+
+          <button className="mt-6 w-full rounded-full bg-green-700 py-4 font-bold text-white">
+            Continue
+          </button>
+        </div>
+      </section>
+    </main>
+  );
+}
+EOF
+
+cat > app/business/register/page.tsx <<'EOF'
+import Navbar from "@/components/Navbar";
+
+export default function BusinessRegisterPage() {
+  return (
+    <main className="min-h-screen bg-[#F7F6EF]">
+      <Navbar />
+
+      <section className="mx-auto max-w-2xl px-6 py-16">
+        <div className="rounded-3xl bg-white p-8 shadow-sm">
+          <h1 className="text-4xl font-black">Register Business</h1>
+          <p className="mt-2 text-gray-600">Apply to sell leftover food on ArGadaagdo.</p>
+
+          <input className="mt-6 w-full rounded-2xl border p-4" placeholder="Business name" />
+          <select className="mt-4 w-full rounded-2xl border p-4">
+            <option>Bakery</option>
+            <option>Cafe</option>
+            <option>Restaurant</option>
+            <option>Supermarket</option>
+          </select>
+          <input className="mt-4 w-full rounded-2xl border p-4" placeholder="Address" />
+          <input className="mt-4 w-full rounded-2xl border p-4" placeholder="Phone number" />
+          <input className="mt-4 w-full rounded-2xl border p-4" placeholder="Company ID / Tax number" />
+
+          <button className="mt-6 w-full rounded-full bg-green-700 py-4 font-bold text-white">
+            Submit for Approval
+          </button>
+        </div>
+      </section>
+    </main>
+  );
+}
+EOF
+
+cat > app/business/dashboard/page.tsx <<'EOF'
+import Navbar from "@/components/Navbar";
+import StatCard from "@/components/StatCard";
+
+export default function BusinessDashboardPage() {
+  return (
+    <main className="min-h-screen bg-[#F7F6EF]">
+      <Navbar />
+
+      <section className="px-6 py-12 md:px-12">
+        <h1 className="text-5xl font-black">Business Dashboard</h1>
+        <p className="mt-3 text-gray-600">Create and manage your food offers.</p>
+
+        <div className="mt-8 grid gap-6 md:grid-cols-3">
+          <StatCard title="Today Orders" value="12" />
+          <StatCard title="Active Offers" value="3" />
+          <StatCard title="Saved Food Boxes" value="48" />
+        </div>
+
+        <div className="mt-8 rounded-3xl bg-white p-8 shadow-sm">
+          <h2 className="text-2xl font-black">Create Offer</h2>
+
+          <input className="mt-6 w-full rounded-2xl border p-4" placeholder="Offer title" />
+          <input className="mt-4 w-full rounded-2xl border p-4" placeholder="Description" />
+          <input className="mt-4 w-full rounded-2xl border p-4" placeholder="Price" />
+          <input className="mt-4 w-full rounded-2xl border p-4" placeholder="Old price" />
+          <input className="mt-4 w-full rounded-2xl border p-4" placeholder="Quantity" />
+          <input className="mt-4 w-full rounded-2xl border p-4" placeholder="Pickup start - end" />
+
+          <button className="mt-6 rounded-full bg-green-700 px-8 py-4 font-bold text-white">
+            Publish Offer
+          </button>
+        </div>
+      </section>
+    </main>
+  );
+}
+EOF
+
+cat > app/admin/page.tsx <<'EOF'
+import Navbar from "@/components/Navbar";
+import StatCard from "@/components/StatCard";
+import BusinessCard from "@/components/BusinessCard";
+
+export default function AdminPage() {
+  return (
+    <main className="min-h-screen bg-[#F7F6EF]">
+      <Navbar />
+
+      <section className="px-6 py-12 md:px-12">
+        <h1 className="text-5xl font-black">Admin Panel</h1>
+        <p className="mt-3 text-gray-600">Approve businesses and monitor platform activity.</p>
+
+        <div className="mt-8 grid gap-6 md:grid-cols-3">
+          <StatCard title="Users" value="128" />
+          <StatCard title="Businesses" value="14" />
+          <StatCard title="Orders" value="67" />
+        </div>
+
+        <div className="mt-8">
+          <h2 className="mb-4 text-2xl font-black">Pending Businesses</h2>
+          <BusinessCard />
+        </div>
+      </section>
+    </main>
+  );
+}
+EOF
+
+cat > app/orders/page.tsx <<'EOF'
+import Navbar from "@/components/Navbar";
+
+export default function OrdersPage() {
+  return (
+    <main className="min-h-screen bg-[#F7F6EF]">
+      <Navbar />
+
+      <section className="px-6 py-12 md:px-12">
+        <h1 className="text-5xl font-black">My Orders</h1>
+        <p className="mt-3 text-gray-600">Your reserved food boxes.</p>
+
+        <div className="mt-8 rounded-3xl bg-white p-8 shadow-sm">
+          <p className="text-xl font-bold">Bakery Surprise Bag</p>
+          <p className="mt-2 text-gray-600">Pickup: 20:00 - 21:00</p>
+          <p className="mt-2 font-bold text-green-700">Reserved</p>
+
+          <div className="mt-6 flex h-40 w-40 items-center justify-center rounded-3xl bg-gray-100 text-center font-bold">
+            QR CODE
+          </div>
+        </div>
+      </section>
+    </main>
+  );
+}
+EOF
