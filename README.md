@@ -1,36 +1,34 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# ArGadaagdo 🥡
 
-## Getting Started
+ArGadaagdo is a Georgian food rescue marketplace inspired by Too Good To Go.
 
-First, run the development server:
+Users can discover discounted food offers from local businesses, reserve online, and pick up in-store to help reduce food waste.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## Features
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- User authentication
+- Business registration & approval
+- Live food offers
+- Reservation system
+- Pickup code verification
+- Realtime updates
+- Responsive premium UI
+- Supabase backend
+- Next.js + Tailwind frontend
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Tech Stack
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- Next.js 16
+- React
+- TypeScript
+- Tailwind CSS
+- Supabase
+- Vercel
 
-## Learn More
+## Live Project
 
-To learn more about Next.js, take a look at the following resources:
+Production deployment on Vercel.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Goal
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Reduce food waste in Georgia while helping businesses sell unsold food.
