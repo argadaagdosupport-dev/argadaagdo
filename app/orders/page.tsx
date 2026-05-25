@@ -50,9 +50,7 @@ export default function OrdersPage() {
   }
 
   async function cancelOrder(order: any) {
-    if (order.status !== "reserved") {
-      return;
-    }
+    if (order.status !== "reserved") return;
 
     const { error: orderError } = await supabase
       .from("orders")
@@ -67,18 +65,13 @@ export default function OrdersPage() {
     if (order.offers?.id) {
       const newQuantity = Number(order.offers.quantity || 0) + 1;
 
-      const { error: offerError } = await supabase
+      await supabase
         .from("offers")
         .update({
           quantity: newQuantity,
           active: true,
         })
         .eq("id", order.offers.id);
-
-      if (offerError) {
-        setMessage(offerError.message);
-        return;
-      }
     }
 
     setMessage("Order cancelled. Quantity restored.");
@@ -87,6 +80,24 @@ export default function OrdersPage() {
 
   useEffect(() => {
     loadOrders();
+
+    const channel = supabase
+      .channel("orders-live-updates")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "orders" },
+        () => loadOrders()
+      )
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "offers" },
+        () => loadOrders()
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   const reservedCount = orders.filter((order) => order.status === "reserved").length;
@@ -94,20 +105,20 @@ export default function OrdersPage() {
   const cancelledCount = orders.filter((order) => order.status === "cancelled").length;
 
   return (
-    <main className="min-h-screen bg-[#F7F6EF] text-gray-900">
+    <main className="min-h-screen bg-[#F7F6EF] text-gray-950">
       <Navbar />
 
-      <section className="px-6 py-10 md:px-12 md:py-14">
-        <div className="rounded-[2rem] bg-white p-8 shadow-sm md:p-10">
+      <section className="px-5 py-8 md:px-12 md:py-14">
+        <div className="rounded-[2rem] bg-white p-6 shadow-sm md:p-10">
           <p className="text-sm font-black uppercase tracking-widest text-green-700">
             My reservations
           </p>
 
-          <h1 className="mt-3 text-4xl font-black text-gray-950 md:text-6xl">
-            Your food pickup orders
+          <h1 className="mt-3 text-4xl font-black md:text-6xl">
+            Your pickup orders
           </h1>
 
-          <p className="mt-4 max-w-2xl text-lg font-medium text-gray-700">
+          <p className="mt-4 max-w-2xl text-base font-semibold text-gray-700 md:text-lg">
             Show your pickup code at the business during pickup time.
           </p>
 
@@ -153,9 +164,7 @@ export default function OrdersPage() {
               🥡
             </div>
 
-            <h2 className="mt-5 text-3xl font-black text-gray-950">
-              No orders yet
-            </h2>
+            <h2 className="mt-5 text-3xl font-black">No orders yet</h2>
 
             <p className="mt-3 font-medium text-gray-600">
               Reserve your first food offer and it will appear here.
@@ -182,7 +191,7 @@ export default function OrdersPage() {
             return (
               <div
                 key={order.id}
-                className="rounded-[2rem] bg-white p-6 shadow-sm md:p-8"
+                className="rounded-[2rem] bg-white p-5 shadow-sm md:p-8"
               >
                 <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
                   <div>
@@ -198,7 +207,7 @@ export default function OrdersPage() {
                       </span>
                     </div>
 
-                    <h2 className="mt-4 text-3xl font-black text-gray-950">
+                    <h2 className="mt-4 text-3xl font-black">
                       {order.offers?.title || "Offer deleted"}
                     </h2>
 
@@ -219,8 +228,6 @@ export default function OrdersPage() {
                       <p className="font-black text-green-700">
                         Price: ₾{order.offers?.price}
                       </p>
-
-                      <p className="font-medium">Payment: Cash on pickup</p>
                     </div>
                   </div>
 
@@ -246,18 +253,6 @@ export default function OrdersPage() {
                       >
                         Cancel Order
                       </button>
-                    )}
-
-                    {order.status === "completed" && (
-                      <p className="mt-5 rounded-full bg-green-100 px-5 py-3 font-black text-green-700">
-                        Picked up
-                      </p>
-                    )}
-
-                    {order.status === "cancelled" && (
-                      <p className="mt-5 rounded-full bg-red-100 px-5 py-3 font-black text-red-700">
-                        Cancelled
-                      </p>
                     )}
                   </div>
                 </div>
