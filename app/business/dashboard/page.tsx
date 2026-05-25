@@ -231,9 +231,27 @@ export default function BusinessDashboardPage() {
     setPickupCode("");
   }
 
-  useEffect(() => {
-    loadDashboard();
-  }, []);
+useEffect(() => {
+  loadDashboard();
+
+  const channel = supabase
+    .channel("business-dashboard-live-updates")
+    .on(
+      "postgres_changes",
+      { event: "*", schema: "public", table: "orders" },
+      () => loadDashboard()
+    )
+    .on(
+      "postgres_changes",
+      { event: "*", schema: "public", table: "offers" },
+      () => loadDashboard()
+    )
+    .subscribe();
+
+  return () => {
+    supabase.removeChannel(channel);
+  };
+}, []);
 
   const activeOffers = offers.filter((offer) => offer.active);
   const completedOrders = orders.filter((order) => order.status === "completed");
