@@ -108,8 +108,7 @@ export default function OrdersPage() {
           </h1>
 
           <p className="mt-4 max-w-2xl text-lg font-medium text-gray-700">
-            Track your reserved food offers, pickup time, business address and
-            order status.
+            Show your pickup code at the business during pickup time.
           </p>
 
           <div className="mt-8 grid gap-4 md:grid-cols-3">
@@ -185,7 +184,7 @@ export default function OrdersPage() {
                 key={order.id}
                 className="rounded-[2rem] bg-white p-6 shadow-sm md:p-8"
               >
-                <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
+                <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
                   <div>
                     <div className="flex flex-wrap items-center gap-3">
                       <span
@@ -221,30 +220,42 @@ export default function OrdersPage() {
                         Price: ₾{order.offers?.price}
                       </p>
 
-                      <p className="font-medium">
-                        Payment: Cash on pickup
-                      </p>
+                      <p className="font-medium">Payment: Cash on pickup</p>
                     </div>
                   </div>
 
-                  <div className="flex flex-col gap-3 md:items-end">
+                  <div className="rounded-[2rem] bg-[#F7F6EF] p-5 text-center lg:min-w-[220px]">
+                    <p className="text-sm font-black uppercase tracking-widest text-gray-500">
+                      Pickup Code
+                    </p>
+
+                    <div className="mt-3 rounded-3xl bg-white px-6 py-5 shadow-sm">
+                      <p className="text-4xl font-black tracking-widest text-green-700">
+                        {order.pickup_code || "------"}
+                      </p>
+                    </div>
+
+                    <p className="mt-3 text-sm font-bold text-gray-600">
+                      Show this code at pickup.
+                    </p>
+
                     {order.status === "reserved" && (
                       <button
                         onClick={() => cancelOrder(order)}
-                        className="rounded-full bg-red-600 px-6 py-3 font-black text-white transition hover:bg-red-700"
+                        className="mt-5 w-full rounded-full bg-red-600 px-6 py-3 font-black text-white transition hover:bg-red-700"
                       >
                         Cancel Order
                       </button>
                     )}
 
                     {order.status === "completed" && (
-                      <p className="rounded-full bg-green-100 px-5 py-3 font-black text-green-700">
+                      <p className="mt-5 rounded-full bg-green-100 px-5 py-3 font-black text-green-700">
                         Picked up
                       </p>
                     )}
 
                     {order.status === "cancelled" && (
-                      <p className="rounded-full bg-red-100 px-5 py-3 font-black text-red-700">
+                      <p className="mt-5 rounded-full bg-red-100 px-5 py-3 font-black text-red-700">
                         Cancelled
                       </p>
                     )}
