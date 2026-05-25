@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 
 export default function BusinessDashboardPage() {
   const [loading, setLoading] = useState(true);
+
   const [businesses, setBusinesses] = useState<any[]>([]);
   const [approvedBusinesses, setApprovedBusinesses] = useState<any[]>([]);
   const [offers, setOffers] = useState<any[]>([]);
@@ -19,6 +20,7 @@ export default function BusinessDashboardPage() {
   const [pickupStart, setPickupStart] = useState("");
   const [pickupEnd, setPickupEnd] = useState("");
   const [imageFile, setImageFile] = useState<File | null>(null);
+  const [pickupCode, setPickupCode] = useState("");
   const [message, setMessage] = useState("");
 
   async function loadDashboard() {
@@ -206,6 +208,29 @@ export default function BusinessDashboardPage() {
     loadDashboard();
   }
 
+  async function verifyPickupCode() {
+    setMessage("");
+
+    if (!pickupCode.trim()) {
+      setMessage("Enter pickup code.");
+      return;
+    }
+
+    const order = orders.find(
+      (item) =>
+        item.pickup_code === pickupCode.trim() &&
+        item.status === "reserved"
+    );
+
+    if (!order) {
+      setMessage("Invalid pickup code or order already completed.");
+      return;
+    }
+
+    await completeOrder(order.id);
+    setPickupCode("");
+  }
+
   useEffect(() => {
     loadDashboard();
   }, []);
@@ -213,6 +238,7 @@ export default function BusinessDashboardPage() {
   const activeOffers = offers.filter((offer) => offer.active);
   const completedOrders = orders.filter((order) => order.status === "completed");
   const reservedOrders = orders.filter((order) => order.status === "reserved");
+  const cancelledOrders = orders.filter((order) => order.status === "cancelled");
 
   if (loading) {
     return (
@@ -226,14 +252,46 @@ export default function BusinessDashboardPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#F7F6EF]">
+    <main className="min-h-screen bg-[#F7F6EF] text-gray-950">
       <Navbar />
 
-      <section className="px-6 py-12 md:px-12">
-        <h1 className="text-5xl font-black">Business Dashboard</h1>
-        <p className="mt-3 text-gray-700 font-medium">
-          Manage your offers and reservations.
-        </p>
+      <section className="px-6 py-10 md:px-12 md:py-14">
+        <div className="rounded-[2.5rem] bg-green-800 p-8 text-white shadow-xl md:p-12">
+          <p className="text-sm font-black uppercase tracking-widest text-green-100">
+            Business control center
+          </p>
+
+          <h1 className="mt-3 text-4xl font-black md:text-6xl">
+            Manage offers and pickups.
+          </h1>
+
+          <p className="mt-4 max-w-2xl text-lg font-semibold text-green-50">
+            Publish rescue boxes, track reservations, and verify pickup codes
+            when customers arrive.
+          </p>
+
+          <div className="mt-8 grid gap-4 md:grid-cols-4">
+            <div className="rounded-3xl bg-white/10 p-5">
+              <p className="text-sm font-black text-green-100">Active Offers</p>
+              <h2 className="mt-1 text-4xl font-black">{activeOffers.length}</h2>
+            </div>
+
+            <div className="rounded-3xl bg-white/10 p-5">
+              <p className="text-sm font-black text-green-100">Reserved</p>
+              <h2 className="mt-1 text-4xl font-black">{reservedOrders.length}</h2>
+            </div>
+
+            <div className="rounded-3xl bg-white/10 p-5">
+              <p className="text-sm font-black text-green-100">Completed</p>
+              <h2 className="mt-1 text-4xl font-black">{completedOrders.length}</h2>
+            </div>
+
+            <div className="rounded-3xl bg-white/10 p-5">
+              <p className="text-sm font-black text-green-100">Cancelled</p>
+              <h2 className="mt-1 text-4xl font-black">{cancelledOrders.length}</h2>
+            </div>
+          </div>
+        </div>
 
         {message && (
           <div className="mt-6 rounded-2xl bg-green-100 p-4 font-bold text-green-700">
@@ -241,31 +299,27 @@ export default function BusinessDashboardPage() {
           </div>
         )}
 
-        <div className="mt-8 grid gap-6 md:grid-cols-4">
-          <div className="rounded-3xl bg-white p-6 shadow-sm">
-            <p className="text-sm font-bold text-gray-600">Businesses</p>
-            <h2 className="mt-2 text-4xl font-black">{businesses.length}</h2>
-          </div>
+        <div className="mt-8 rounded-[2rem] bg-white p-8 shadow-sm">
+          <h2 className="text-3xl font-black">Verify Pickup Code</h2>
 
-          <div className="rounded-3xl bg-white p-6 shadow-sm">
-            <p className="text-sm font-bold text-gray-600">Active Offers</p>
-            <h2 className="mt-2 text-4xl font-black text-green-700">
-              {activeOffers.length}
-            </h2>
-          </div>
+          <p className="mt-2 font-semibold text-gray-600">
+            Ask customer for the 6-digit pickup code from their Orders page.
+          </p>
 
-          <div className="rounded-3xl bg-white p-6 shadow-sm">
-            <p className="text-sm font-bold text-gray-600">Reserved</p>
-            <h2 className="mt-2 text-4xl font-black text-yellow-600">
-              {reservedOrders.length}
-            </h2>
-          </div>
+          <div className="mt-6 flex flex-col gap-4 md:flex-row">
+            <input
+              value={pickupCode}
+              onChange={(e) => setPickupCode(e.target.value)}
+              placeholder="Enter pickup code"
+              className="rounded-2xl border bg-white p-4 text-xl font-black tracking-widest outline-none md:max-w-sm"
+            />
 
-          <div className="rounded-3xl bg-white p-6 shadow-sm">
-            <p className="text-sm font-bold text-gray-600">Completed</p>
-            <h2 className="mt-2 text-4xl font-black text-blue-600">
-              {completedOrders.length}
-            </h2>
+            <button
+              onClick={verifyPickupCode}
+              className="rounded-full bg-green-700 px-8 py-4 font-black text-white transition hover:bg-green-800"
+            >
+              Verify Pickup
+            </button>
           </div>
         </div>
 
@@ -281,14 +335,14 @@ export default function BusinessDashboardPage() {
         )}
 
         {approvedBusinesses.length > 0 && (
-          <div className="mt-8 rounded-3xl bg-white p-8 shadow-sm">
-            <h2 className="text-2xl font-black">Create Offer</h2>
+          <div className="mt-8 rounded-[2rem] bg-white p-8 shadow-sm">
+            <h2 className="text-3xl font-black">Create Offer</h2>
 
             <div className="mt-6 grid gap-4 md:grid-cols-2">
               <select
                 value={businessId}
                 onChange={(e) => setBusinessId(e.target.value)}
-                className="rounded-2xl border p-4"
+                className="rounded-2xl border p-4 font-semibold"
               >
                 {approvedBusinesses.map((business) => (
                   <option key={business.id} value={business.id}>
@@ -300,42 +354,42 @@ export default function BusinessDashboardPage() {
               <input
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                className="rounded-2xl border p-4"
+                className="rounded-2xl border p-4 font-semibold"
                 placeholder="Offer title"
               />
 
               <input
                 value={price}
                 onChange={(e) => setPrice(e.target.value)}
-                className="rounded-2xl border p-4"
+                className="rounded-2xl border p-4 font-semibold"
                 placeholder="Price"
               />
 
               <input
                 value={oldPrice}
                 onChange={(e) => setOldPrice(e.target.value)}
-                className="rounded-2xl border p-4"
+                className="rounded-2xl border p-4 font-semibold"
                 placeholder="Old price"
               />
 
               <input
                 value={quantity}
                 onChange={(e) => setQuantity(e.target.value)}
-                className="rounded-2xl border p-4"
+                className="rounded-2xl border p-4 font-semibold"
                 placeholder="Quantity"
               />
 
               <input
                 value={pickupStart}
                 onChange={(e) => setPickupStart(e.target.value)}
-                className="rounded-2xl border p-4"
+                className="rounded-2xl border p-4 font-semibold"
                 placeholder="Pickup start"
               />
 
               <input
                 value={pickupEnd}
                 onChange={(e) => setPickupEnd(e.target.value)}
-                className="rounded-2xl border p-4"
+                className="rounded-2xl border p-4 font-semibold"
                 placeholder="Pickup end"
               />
 
@@ -343,21 +397,21 @@ export default function BusinessDashboardPage() {
                 type="file"
                 accept="image/*"
                 onChange={(e) => setImageFile(e.target.files?.[0] || null)}
-                className="rounded-2xl border bg-white p-4"
+                className="rounded-2xl border bg-white p-4 font-semibold"
               />
             </div>
 
             <button
               onClick={createOffer}
-              className="mt-6 rounded-full bg-green-700 px-8 py-4 font-bold text-white"
+              className="mt-6 rounded-full bg-green-700 px-8 py-4 font-black text-white transition hover:bg-green-800"
             >
               Publish Offer
             </button>
           </div>
         )}
 
-        <div className="mt-8 rounded-3xl bg-white p-8 shadow-sm">
-          <h2 className="text-2xl font-black">My Offers</h2>
+        <div className="mt-8 rounded-[2rem] bg-white p-8 shadow-sm">
+          <h2 className="text-3xl font-black">My Offers</h2>
 
           <div className="mt-6 grid gap-4">
             {offers.length === 0 && (
@@ -384,7 +438,7 @@ export default function BusinessDashboardPage() {
 
                   <div>
                     <h3 className="text-xl font-black">{offer.title}</h3>
-                    <p className="text-gray-700 font-medium">
+                    <p className="font-medium text-gray-700">
                       ₾{offer.price} · Quantity: {offer.quantity}
                     </p>
                     <p className="text-gray-600">
@@ -404,8 +458,8 @@ export default function BusinessDashboardPage() {
           </div>
         </div>
 
-        <div className="mt-8 rounded-3xl bg-white p-8 shadow-sm">
-          <h2 className="text-2xl font-black">Reservations</h2>
+        <div className="mt-8 rounded-[2rem] bg-white p-8 shadow-sm">
+          <h2 className="text-3xl font-black">Reservations</h2>
 
           <div className="mt-6 grid gap-4">
             {orders.length === 0 && (
@@ -415,33 +469,44 @@ export default function BusinessDashboardPage() {
             {orders.map((order) => (
               <div
                 key={order.id}
-                className="flex flex-col gap-4 rounded-2xl border p-5 md:flex-row md:items-center md:justify-between"
+                className="flex flex-col gap-5 rounded-2xl border p-5 lg:flex-row lg:items-center lg:justify-between"
               >
                 <div>
-                  <h3 className="text-xl font-black">{order.offers?.title}</h3>
-                  <p className="text-gray-700 font-medium">
+                  <h3 className="text-2xl font-black">{order.offers?.title}</h3>
+
+                  <p className="mt-2 font-semibold text-gray-700">
                     Customer: {order.profiles?.email}
                   </p>
 
-                  <p
-                    className={`mt-2 inline-block rounded-full px-3 py-1 text-sm font-bold ${
-                      order.status === "completed"
-                        ? "bg-green-100 text-green-700"
-                        : order.status === "cancelled"
-                        ? "bg-red-100 text-red-700"
-                        : "bg-yellow-100 text-yellow-700"
-                    }`}
-                  >
-                    {order.status}
+                  <p className="mt-1 font-black text-green-700">
+                    ₾{order.offers?.price}
                   </p>
+
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    <span
+                      className={`rounded-full px-4 py-2 text-sm font-black ${
+                        order.status === "completed"
+                          ? "bg-green-100 text-green-700"
+                          : order.status === "cancelled"
+                          ? "bg-red-100 text-red-700"
+                          : "bg-yellow-100 text-yellow-700"
+                      }`}
+                    >
+                      {order.status}
+                    </span>
+
+                    <span className="rounded-full bg-gray-100 px-4 py-2 text-sm font-black text-gray-700">
+                      Code: {order.pickup_code || "------"}
+                    </span>
+                  </div>
                 </div>
 
                 {order.status === "reserved" && (
                   <button
                     onClick={() => completeOrder(order.id)}
-                    className="rounded-full bg-green-700 px-5 py-3 font-bold text-white"
+                    className="rounded-full bg-green-700 px-5 py-3 font-black text-white transition hover:bg-green-800"
                   >
-                    Complete Order
+                    Complete Manually
                   </button>
                 )}
               </div>
