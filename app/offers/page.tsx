@@ -10,6 +10,10 @@ export default function OffersPage() {
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(true);
 
+  function generatePickupCode() {
+    return Math.floor(100000 + Math.random() * 900000).toString();
+  }
+
   async function loadOffers() {
     setLoading(true);
 
@@ -40,11 +44,14 @@ export default function OffersPage() {
       return;
     }
 
+    const pickupCode = generatePickupCode();
+
     const { error: orderError } = await supabase.from("orders").insert({
       user_id: userData.user.id,
       offer_id: offer.id,
       status: "reserved",
       payment_method: "cash",
+      pickup_code: pickupCode,
     });
 
     if (orderError) {
@@ -67,7 +74,7 @@ export default function OffersPage() {
       return;
     }
 
-    setMessage("Reserved successfully. Check your orders page.");
+    setMessage("Reserved successfully. Your pickup code is in Orders.");
     loadOffers();
   }
 
@@ -133,30 +140,20 @@ export default function OffersPage() {
 
               <div className="grid gap-4 sm:grid-cols-3 lg:grid-cols-1">
                 <div className="rounded-3xl bg-white/10 p-5">
-                  <p className="text-sm font-black text-green-100">
-                    Offers
-                  </p>
-                  <h2 className="mt-1 text-4xl font-black">
-                    {offers.length}
-                  </h2>
+                  <p className="text-sm font-black text-green-100">Offers</p>
+                  <h2 className="mt-1 text-4xl font-black">{offers.length}</h2>
                 </div>
 
                 <div className="rounded-3xl bg-white/10 p-5">
                   <p className="text-sm font-black text-green-100">
                     Food boxes left
                   </p>
-                  <h2 className="mt-1 text-4xl font-black">
-                    {totalAvailable}
-                  </h2>
+                  <h2 className="mt-1 text-4xl font-black">{totalAvailable}</h2>
                 </div>
 
                 <div className="rounded-3xl bg-white/10 p-5">
-                  <p className="text-sm font-black text-green-100">
-                    Pickup
-                  </p>
-                  <h2 className="mt-1 text-4xl font-black">
-                    100%
-                  </h2>
+                  <p className="text-sm font-black text-green-100">Pickup</p>
+                  <h2 className="mt-1 text-4xl font-black">100%</h2>
                 </div>
               </div>
             </div>
@@ -174,9 +171,7 @@ export default function OffersPage() {
                 Available now
               </p>
 
-              <h2 className="mt-2 text-4xl font-black">
-                Food rescue offers
-              </h2>
+              <h2 className="mt-2 text-4xl font-black">Food rescue offers</h2>
 
               <p className="mt-2 font-semibold text-gray-700">
                 {filteredOffers.length} offer(s) match your search.
