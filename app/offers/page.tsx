@@ -10,10 +10,6 @@ export default function OffersPage() {
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(true);
 
-  function generatePickupCode() {
-    return Math.floor(100000 + Math.random() * 900000).toString();
-  }
-
   async function loadOffers() {
     const { data } = await supabase
       .from("offers")
@@ -36,33 +32,13 @@ export default function OffersPage() {
       return;
     }
 
-    const pickupCode = generatePickupCode();
-
-    const { error: orderError } = await supabase.from("orders").insert({
-      user_id: userData.user.id,
-      offer_id: offer.id,
-      status: "reserved",
-      payment_method: "cash",
-      pickup_code: pickupCode,
+    const { error } = await supabase.rpc("reserve_offer", {
+      p_offer_id: offer.id,
     });
 
-    if (orderError) {
-      setMessage(orderError.message);
-      return;
-    }
-
-    const newQuantity = Number(offer.quantity) - 1;
-
-    const { error: updateError } = await supabase
-      .from("offers")
-      .update({
-        quantity: newQuantity,
-        active: newQuantity > 0,
-      })
-      .eq("id", offer.id);
-
-    if (updateError) {
-      setMessage(updateError.message);
+    if (error) {
+      setMessage(error.message);
+      loadOffers();
       return;
     }
 
